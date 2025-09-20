@@ -105,31 +105,6 @@ Expected Output: 36/36 tests passing (100% success)
    - `//[***]\n1***2***3` → `6`
    - `//[*][%]\n1*2%3` → `6`
 
-## 🔧 Architecture
-
-
-string-calculator-tdd/
-├── 🐍 backend/ # Flask API Backend
-│ ├── src/
-│ │ ├── string_calculator.py # 🧮 Core TDD implementation
-│ │ ├── api.py # 🌐 Flask REST API
-│ │ └── exceptions.py # ⚠️ Custom exceptions
-│ ├── tests/
-│ │ ├── test_string_calculator.py # ✅ 9 TDD core tests
-│ │ ├── test_api.py # ✅ 4 API tests
-│ │ └── test_integration.py # ✅ 16 integration tests
-│ └── requirements.txt # 📦 Dependencies
-├── ⚛️ frontend/ # React Frontend
-│ ├── src/
-│ │ ├── components/
-│ │ │ ├── StringCalculator.js # 🎨 Main component
-│ │ │ ├── StringCalculator.css # 💄 Incubyte styling
-│ │ │ └── StringCalculator.test.js # ✅ 6 component tests
-│ │ └── App.js # 🏠 Root application
-│ └── package.json # 📦 Dependencies
-└── 📝 MANUAL_TESTING_CHECKLIST.md # 🧪 QA guidelines
-
-
 
 ## ✨ Features Implemented
 
