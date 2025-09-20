@@ -125,3 +125,34 @@ class TestStringCalculator:
         result = self.calculator.add("//[DELIM]\n1DELIM2DELIM3DELIM4")
         assert result == 10, "Long delimiter should work correctly"
 
+	    # ===== STEP 4C: MULTIPLE CUSTOM DELIMITERS (NEW - RED PHASE) =====
+    def test_multiple_custom_delimiters(self):
+        """
+        RED PHASE - TDD Cycle 8
+        
+        Test: Multiple custom delimiters with //[delim1][delim2]\\n[numbers...] format
+        Examples: "//[*][%]\\n1*2%3" -> 6, "//[**][%%]\\n1**2%%3" -> 6
+        
+        Expected: WILL FAIL - multiple delimiter parsing not implemented yet
+        """
+        # Two single-char delimiters
+        result = self.calculator.add("//[*][%]\n1*2%3")
+        assert result == 6, "Multiple delimiters '//[*][%]\\n1*2%3' should return 6"
+        
+        # Two multi-char delimiters
+        result = self.calculator.add("//[**][%%]\n1**2%%3")
+        assert result == 6, "Multi-char multiple delimiters should return 6"
+        
+        # Three delimiters
+        result = self.calculator.add("//[*][%][!]\n1*2%3!4")
+        assert result == 10, "Three delimiters should work correctly"
+        
+        # Mixed single and multi-char
+        result = self.calculator.add("//[***][%]\n1***2%3")
+        assert result == 6, "Mixed delimiter lengths should work"
+        
+        # Complex example
+        result = self.calculator.add("//[sep][::][#]\n10sep20::30#40")
+        assert result == 100, "Complex multiple delimiters should work"
+
+
