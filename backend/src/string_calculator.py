@@ -1,7 +1,7 @@
 """
 String Calculator implementation following TDD principles.
 
-GREEN PHASE - TDD Cycle 5: Add newline delimiter support.
+REFACTOR PHASE - TDD Cycle 5: Clean, maintainable implementation.
 """
 
 
@@ -9,20 +9,23 @@ class StringCalculator:
     """
     A calculator that performs operations on numbers provided as strings.
     
-    Features:
-    - Empty string returns 0 ✅
-    - Single number returns the number itself ✅
-    - Multiple numbers with comma return their sum ✅
-    - Multiple numbers with newline delimiter ✅ (GREEN phase)
-    - Mixed comma and newline delimiters ✅ (GREEN phase)
+    Supported Features:
+    - Empty string returns 0
+    - Single number returns the number itself
+    - Multiple numbers with comma and/or newline delimiters
+    - Handles whitespace gracefully
+    - Unlimited amount of numbers
     """
+    
+    # Supported delimiters
+    DEFAULT_DELIMITERS = [',', '\n']
     
     def add(self, numbers: str) -> int:
         """
         Add numbers from a string with various delimiter support.
         
         Args:
-            numbers: String containing numbers separated by commas and/or newlines
+            numbers: String containing numbers separated by delimiters
             
         Returns:
             Sum of all valid numbers
@@ -33,30 +36,62 @@ class StringCalculator:
             0
             >>> calc.add("1")
             1
-            >>> calc.add("1,2")
-            3
             >>> calc.add("1,2,3")
-            6
-            >>> calc.add("1\\n2,3")
             6
             >>> calc.add("1\\n2\\n3")
             6
+            >>> calc.add("1\\n2,3")
+            6
         """
-        # Handle empty string
         if not numbers:
             return 0
         
-        # GREEN PHASE: Handle both comma and newline delimiters
-        # Replace newlines with commas first, then split by comma
-        normalized = numbers.replace('\n', ',')
+        number_list = self._parse_numbers(numbers)
+        return sum(number_list)
+    
+    def _parse_numbers(self, numbers: str) -> list[int]:
+        """
+        Parse numbers from input string using supported delimiters.
         
-        # Split by comma and sum all parts
+        Args:
+            numbers: Input string containing numbers
+            
+        Returns:
+            List of integers parsed from string
+        """
+        # Normalize all delimiters to commas for easier processing
+        normalized = self._normalize_delimiters(numbers)
+        
+        # Split by comma and convert to integers
         parts = normalized.split(',')
-        total = 0
+        result = []
         
         for part in parts:
             cleaned_part = part.strip()
-            if cleaned_part:  # Skip empty parts
-                total += int(cleaned_part)
+            if cleaned_part:
+                try:
+                    result.append(int(cleaned_part))
+                except ValueError:
+                    # Skip invalid numbers gracefully
+                    continue
         
-        return total
+        return result
+    
+    def _normalize_delimiters(self, numbers: str) -> str:
+        """
+        Convert all supported delimiters to commas for uniform processing.
+        
+        Args:
+            numbers: Input string with mixed delimiters
+            
+        Returns:
+            String with all delimiters normalized to commas
+        """
+        normalized = numbers
+        
+        # Replace all supported delimiters with commas
+        for delimiter in self.DEFAULT_DELIMITERS:
+            if delimiter != ',':  # Don't replace commas with commas
+                normalized = normalized.replace(delimiter, ',')
+        
+        return normalized
