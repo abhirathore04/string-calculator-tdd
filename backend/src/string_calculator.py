@@ -1,7 +1,7 @@
 """
 String Calculator implementation following TDD principles.
 
-REFACTOR PHASE - TDD Cycle 2: Improved structure for future expansion.
+GREEN PHASE - TDD Cycle 3: Add two numbers with comma delimiter.
 """
 
 
@@ -12,7 +12,7 @@ class StringCalculator:
     Features (TDD-implemented):
     - Empty string returns 0 ✅
     - Single number returns the number itself ✅
-    - Future: Multiple numbers, custom delimiters
+    - Two numbers with comma return their sum ✅ (GREEN phase)
     """
     
     def add(self, numbers: str) -> int:
@@ -25,26 +25,21 @@ class StringCalculator:
         Returns:
             Sum of all valid numbers
             
-        Raises:
-            ValueError: If number format is invalid (future implementation)
-            
         Examples:
             >>> calc = StringCalculator()
             >>> calc.add("")
             0
             >>> calc.add("1")
             1
-            >>> calc.add("42")
-            42
+            >>> calc.add("1,2")
+            3
+            >>> calc.add("10, 20")
+            30
         """
-        # Handle empty string
         if not numbers:
             return 0
         
-        # Parse numbers from input string
         number_list = self._parse_numbers(numbers)
-        
-        # Return sum of all parsed numbers
         return sum(number_list)
     
     def _parse_numbers(self, numbers: str) -> list[int]:
@@ -56,15 +51,27 @@ class StringCalculator:
             
         Returns:
             List of integers parsed from the string
-            
-        Current Implementation:
-        - Single number: ["42"] from "42"
-        - Future: Multiple numbers with delimiters
         """
-        # REFACTOR: Extract parsing logic for better separation of concerns
-        # Current: Handle single number only
-        try:
-            return [int(numbers.strip())]
-        except ValueError:
-            # Future: Handle parsing errors appropriately
-            return []
+        # GREEN PHASE: Handle comma-separated numbers
+        if ',' in numbers:
+            # Split by comma and convert each part to integer
+            parts = numbers.split(',')
+            result = []
+            
+            for part in parts:
+                # Strip whitespace and convert to integer
+                cleaned_part = part.strip()
+                if cleaned_part:  # Skip empty parts
+                    try:
+                        result.append(int(cleaned_part))
+                    except ValueError:
+                        # Skip invalid numbers for now
+                        continue
+            
+            return result
+        else:
+            # Handle single number (existing functionality)
+            try:
+                return [int(numbers.strip())]
+            except ValueError:
+                return []
