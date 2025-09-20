@@ -34,36 +34,42 @@ class TestStringCalculator:
         assert self.calculator.add("5,7") == 12
         assert self.calculator.add("10,20") == 30
     
-    # ===== STEP 3A: MULTIPLE NUMBERS (NEW - RED PHASE) =====
+    # ===== STEP 3A: MULTIPLE NUMBERS ✅ =====
     def test_multiple_numbers_comma_separated(self):
+        """Test: Handle unlimited amount of numbers with commas"""
+        assert self.calculator.add("1,2,3") == 6
+        assert self.calculator.add("1,2,3,4") == 10
+        assert self.calculator.add("1,2,3,4,5") == 15
+        assert self.calculator.add("10,20,30") == 60
+        assert self.calculator.add("1,0,2,0,3") == 6
+        assert self.calculator.add("1,1,1,1,1,1,1,1,1,1") == 10
+    
+    # ===== STEP 3B: NEWLINE DELIMITERS (NEW - RED PHASE) =====
+    def test_newline_delimiters(self):
         """
-        RED PHASE - TDD Cycle 4
+        RED PHASE - TDD Cycle 5
         
-        Test: Handle unlimited amount of numbers
-        Examples: "1,2,3" -> 6, "1,2,3,4,5" -> 15
+        Test: Allow newlines as delimiters (along with commas)
+        Examples: "1\\n2,3" -> 6, "1\\n2\\n3" -> 6
         
-        Expected: WILL FAIL - unlimited numbers not implemented yet
+        Expected: WILL FAIL - newline parsing not implemented yet
         """
-        # Test 3 numbers
-        result = self.calculator.add("1,2,3")
-        assert result == 6, "Three numbers '1,2,3' should return 6"
+        # Basic newline + comma combination
+        result = self.calculator.add("1\n2,3")
+        assert result == 6, "Mixed delimiters '1\\n2,3' should return 6"
         
-        # Test 4 numbers
-        result = self.calculator.add("1,2,3,4")
-        assert result == 10, "Four numbers '1,2,3,4' should return 10"
+        # Pure newline delimiters
+        result = self.calculator.add("1\n2\n3")
+        assert result == 6, "Newline delimiters '1\\n2\\n3' should return 6"
         
-        # Test 5 numbers
-        result = self.calculator.add("1,2,3,4,5")
-        assert result == 15, "Five numbers '1,2,3,4,5' should return 15"
+        # More complex combinations
+        result = self.calculator.add("1,2\n3,4\n5")
+        assert result == 15, "Complex mix '1,2\\n3,4\\n5' should return 15"
         
-        # Test with larger numbers
-        result = self.calculator.add("10,20,30")
-        assert result == 60, "Larger numbers '10,20,30' should return 60"
+        # Newline with two numbers
+        result = self.calculator.add("10\n20")
+        assert result == 30, "Two numbers with newline '10\\n20' should return 30"
         
-        # Test with zeros mixed in
-        result = self.calculator.add("1,0,2,0,3")
-        assert result == 6, "Numbers with zeros '1,0,2,0,3' should return 6"
-        
-        # Test many numbers
-        result = self.calculator.add("1,1,1,1,1,1,1,1,1,1")
-        assert result == 10, "Ten ones should return 10"
+        # Single number with newline at end (edge case)
+        result = self.calculator.add("5\n")
+        assert result == 5, "Number with trailing newline '5\\n' should return 5"
