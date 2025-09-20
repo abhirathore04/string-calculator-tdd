@@ -1,7 +1,7 @@
 """
 Test cases for String Calculator following TDD approach.
 
-Step 3: Multiple numbers and newline delimiters
+Step 4: Custom delimiters with //[delimiter]\n[numbers...] format
 """
 
 import pytest
@@ -15,7 +15,7 @@ class TestStringCalculator:
         from src.string_calculator import StringCalculator
         self.calculator = StringCalculator()
     
-    # ===== STEP 1 & 2: COMPLETED ✅ =====
+    # ===== STEPS 1-3: COMPLETED ✅ =====
     def test_empty_string_returns_zero(self):
         """Test: Empty string should return 0"""
         assert self.calculator.add("") == 0
@@ -34,7 +34,6 @@ class TestStringCalculator:
         assert self.calculator.add("5,7") == 12
         assert self.calculator.add("10,20") == 30
     
-    # ===== STEP 3A: MULTIPLE NUMBERS ✅ =====
     def test_multiple_numbers_comma_separated(self):
         """Test: Handle unlimited amount of numbers with commas"""
         assert self.calculator.add("1,2,3") == 6
@@ -44,50 +43,54 @@ class TestStringCalculator:
         assert self.calculator.add("1,0,2,0,3") == 6
         assert self.calculator.add("1,1,1,1,1,1,1,1,1,1") == 10
     
-    # ===== STEP 3B: NEWLINE DELIMITERS (NEW - RED PHASE) =====
     def test_newline_delimiters(self):
-        """
-        RED PHASE - TDD Cycle 5
-        
-        Test: Allow newlines as delimiters (along with commas)
-        Examples: "1\\n2,3" -> 6, "1\\n2\\n3" -> 6
-        
-        Expected: WILL FAIL - newline parsing not implemented yet
-        """
-        # Basic newline + comma combination
-        result = self.calculator.add("1\n2,3")
-        assert result == 6, "Mixed delimiters '1\\n2,3' should return 6"
-        
-        # Pure newline delimiters
-        result = self.calculator.add("1\n2\n3")
-        assert result == 6, "Newline delimiters '1\\n2\\n3' should return 6"
-        
-        # More complex combinations
-        result = self.calculator.add("1,2\n3,4\n5")
-        assert result == 15, "Complex mix '1,2\\n3,4\\n5' should return 15"
-        
-        # Newline with two numbers
-        result = self.calculator.add("10\n20")
-        assert result == 30, "Two numbers with newline '10\\n20' should return 30"
-        
-        # Single number with newline at end (edge case)
-        result = self.calculator.add("5\n")
-        assert result == 5, "Number with trailing newline '5\\n' should return 5"
-
-	# ===== STEP 3C: EDGE CASES =====
+        """Test: Allow newlines as delimiters (along with commas)"""
+        assert self.calculator.add("1\n2,3") == 6
+        assert self.calculator.add("1\n2\n3") == 6
+        assert self.calculator.add("1,2\n3,4\n5") == 15
+        assert self.calculator.add("10\n20") == 30
+        assert self.calculator.add("5\n") == 5
+    
     def test_delimiter_edge_cases(self):
         """Test edge cases for delimiter handling"""
-        # Empty parts should be ignored
-        assert self.calculator.add("1,,2") == 3  # Double comma
-        assert self.calculator.add("1\n\n2") == 3  # Double newline
-        assert self.calculator.add(",1,2,") == 3  # Leading/trailing comma
-        assert self.calculator.add("\n1\n2\n") == 3  # Leading/trailing newline
+        assert self.calculator.add("1,,2") == 3
+        assert self.calculator.add("1\n\n2") == 3
+        assert self.calculator.add(",1,2,") == 3
+        assert self.calculator.add("\n1\n2\n") == 3
+        assert self.calculator.add(" 1 , 2 ") == 3
+        assert self.calculator.add("1\n 2 \n 3") == 6
+        assert self.calculator.add("1,\n2,3\n,4") == 10
+    
+    # ===== STEP 4: CUSTOM DELIMITERS (NEW - RED PHASE) =====
+    def test_custom_single_character_delimiters(self):
+        """
+        RED PHASE - TDD Cycle 6
         
-        # Whitespace handling
-        assert self.calculator.add(" 1 , 2 ") == 3  # Spaces around numbers
-        assert self.calculator.add("1\n 2 \n 3") == 6  # Mixed whitespace
+        Test: Custom single character delimiters with //[delimiter]\\n[numbers...] format
+        Examples: "//;\\n1;2" -> 3, "//*\\n1*2*3" -> 6
         
-        # Complex mixed delimiters
-        assert self.calculator.add("1,\n2,3\n,4") == 10  # Mixed empty parts
-
-
+        Expected: WILL FAIL - custom delimiter parsing not implemented yet
+        """
+        # Basic semicolon delimiter
+        result = self.calculator.add("//;\n1;2")
+        assert result == 3, "Custom delimiter '//;\\n1;2' should return 3"
+        
+        # Asterisk delimiter
+        result = self.calculator.add("//*\n1*2*3")
+        assert result == 6, "Custom delimiter '//*\\n1*2*3' should return 6"
+        
+        # Pipe delimiter
+        result = self.calculator.add("//|\n1|2|3|4")
+        assert result == 10, "Custom delimiter '//|\\n1|2|3|4' should return 10"
+        
+        # Hash delimiter
+        result = self.calculator.add("//#\n5#5#5")
+        assert result == 15, "Custom delimiter '//#\\n5#5#5' should return 15"
+        
+        # Percent delimiter
+        result = self.calculator.add("//%\n10%20%30")
+        assert result == 60, "Custom delimiter '//%\\n10%20%30' should return 60"
+        
+        # Edge case: single number with custom delimiter
+        result = self.calculator.add("//;\n5")
+        assert result == 5, "Single number with custom delimiter '//;\\n5' should return 5"
