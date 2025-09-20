@@ -1,7 +1,7 @@
 """
 Test cases for String Calculator following TDD approach.
 
-Complete Step 2 test coverage: Empty, Single, Two Numbers
+Step 3: Multiple numbers and newline delimiters
 """
 
 import pytest
@@ -15,48 +15,55 @@ class TestStringCalculator:
         from src.string_calculator import StringCalculator
         self.calculator = StringCalculator()
     
-    # Step 1: Empty String ✅
+    # ===== STEP 1 & 2: COMPLETED ✅ =====
     def test_empty_string_returns_zero(self):
         """Test: Empty string should return 0"""
-        result = self.calculator.add("")
-        assert result == 0, "Empty string should return 0"
+        assert self.calculator.add("") == 0
     
-    # Step 2a: Single Numbers ✅
     def test_single_number_returns_itself(self):
-        """Test: Single number string should return the number as integer"""
+        """Test: Single number returns itself"""
         assert self.calculator.add("1") == 1
         assert self.calculator.add("5") == 5
         assert self.calculator.add("42") == 42
         assert self.calculator.add("0") == 0
         assert self.calculator.add("123") == 123
     
-    # Step 2b: Two Numbers (NEW - RED PHASE)
     def test_two_numbers_comma_separated(self):
+        """Test: Two numbers with comma return their sum"""
+        assert self.calculator.add("1,2") == 3
+        assert self.calculator.add("5,7") == 12
+        assert self.calculator.add("10,20") == 30
+    
+    # ===== STEP 3A: MULTIPLE NUMBERS (NEW - RED PHASE) =====
+    def test_multiple_numbers_comma_separated(self):
         """
-        RED PHASE - TDD Cycle 3
+        RED PHASE - TDD Cycle 4
         
-        Test: Two numbers separated by comma should return their sum
-        Examples: "1,2" -> 3, "5,7" -> 12, "10,20" -> 30
+        Test: Handle unlimited amount of numbers
+        Examples: "1,2,3" -> 6, "1,2,3,4,5" -> 15
         
-        Expected: WILL FAIL - comma delimiter parsing not implemented yet
+        Expected: WILL FAIL - unlimited numbers not implemented yet
         """
-        # Basic two-number addition
-        result = self.calculator.add("1,2")
-        assert result == 3, "Two numbers '1,2' should return 3"
+        # Test 3 numbers
+        result = self.calculator.add("1,2,3")
+        assert result == 6, "Three numbers '1,2,3' should return 6"
         
-        result = self.calculator.add("5,7")
-        assert result == 12, "Two numbers '5,7' should return 12"
+        # Test 4 numbers
+        result = self.calculator.add("1,2,3,4")
+        assert result == 10, "Four numbers '1,2,3,4' should return 10"
         
-        result = self.calculator.add("10,20")
-        assert result == 30, "Two numbers '10,20' should return 30"
+        # Test 5 numbers
+        result = self.calculator.add("1,2,3,4,5")
+        assert result == 15, "Five numbers '1,2,3,4,5' should return 15"
         
-        # Edge cases
-        result = self.calculator.add("0,0")
-        assert result == 0, "Two zeros '0,0' should return 0"
+        # Test with larger numbers
+        result = self.calculator.add("10,20,30")
+        assert result == 60, "Larger numbers '10,20,30' should return 60"
         
-        result = self.calculator.add("100,200")
-        assert result == 300, "Larger numbers '100,200' should return 300"
+        # Test with zeros mixed in
+        result = self.calculator.add("1,0,2,0,3")
+        assert result == 6, "Numbers with zeros '1,0,2,0,3' should return 6"
         
-        # Test with spaces (should handle gracefully)
-        result = self.calculator.add("1, 2")
-        assert result == 3, "Numbers with spaces '1, 2' should return 3"
+        # Test many numbers
+        result = self.calculator.add("1,1,1,1,1,1,1,1,1,1")
+        assert result == 10, "Ten ones should return 10"
