@@ -1,7 +1,7 @@
 """
 String Calculator implementation following TDD principles.
 
-REFACTOR PHASE - TDD Cycle 6: Clean, maintainable custom delimiter implementation.
+GREEN PHASE - TDD Cycle 7: Add multi-character custom delimiter support.
 """
 import re
 
@@ -15,14 +15,15 @@ class StringCalculator:
     - Single number returns the number itself
     - Multiple numbers with default delimiters (comma, newline)
     - Custom single character delimiters: //[delimiter]\\n[numbers...]
-    - Handles whitespace and edge cases gracefully
+    - Custom multi-character delimiters: //[delimiter]\\n[numbers...] ✅ (GREEN phase)
     """
     
     # Default supported delimiters
     DEFAULT_DELIMITERS = [',', '\n']
     
-    # Custom delimiter pattern
-    CUSTOM_DELIMITER_PATTERN = r"^//(.)\n(.*)$"
+    # Custom delimiter patterns
+    SINGLE_CHAR_DELIMITER_PATTERN = r"^//(.)\n(.*)$"
+    MULTI_CHAR_DELIMITER_PATTERN = r"^//\[(.+?)\]\n(.*)$"
     
     def add(self, numbers: str) -> int:
         """
@@ -36,15 +37,11 @@ class StringCalculator:
             
         Examples:
             >>> calc = StringCalculator()
-            >>> calc.add("")
-            0
-            >>> calc.add("1,2,3")
-            6
-            >>> calc.add("1\\n2\\n3")
-            6
             >>> calc.add("//;\\n1;2")
             3
-            >>> calc.add("//*\\n1*2*3")
+            >>> calc.add("//[***]\\n1***2***3")
+            6
+            >>> calc.add("//[sep]\\n1sep2sep3")
             6
         """
         if not numbers:
@@ -65,28 +62,25 @@ class StringCalculator:
         Returns:
             Tuple of (delimiters_list, numbers_string)
         """
-        # Check for custom delimiter format using regex
-        match = re.match(self.CUSTOM_DELIMITER_PATTERN, input_string, re.DOTALL)
+        # GREEN PHASE: Check for multi-character delimiter first
+        multi_match = re.match(self.MULTI_CHAR_DELIMITER_PATTERN, input_string, re.DOTALL)
+        if multi_match:
+            custom_delimiter = multi_match.group(1)
+            numbers_part = multi_match.group(2)
+            return [custom_delimiter], numbers_part
         
-        if match:
-            custom_delimiter = match.group(1)
-            numbers_part = match.group(2)
+        # Check for single character delimiter
+        single_match = re.match(self.SINGLE_CHAR_DELIMITER_PATTERN, input_string, re.DOTALL)
+        if single_match:
+            custom_delimiter = single_match.group(1)
+            numbers_part = single_match.group(2)
             return [custom_delimiter], numbers_part
         
         # No custom delimiter, use defaults
         return self.DEFAULT_DELIMITERS.copy(), input_string
     
     def _parse_numbers_with_delimiters(self, numbers_str: str, delimiters: list[str]) -> list[int]:
-        """
-        Parse numbers from string using provided delimiters.
-        
-        Args:
-            numbers_str: String containing numbers
-            delimiters: List of delimiter strings
-            
-        Returns:
-            List of parsed integers
-        """
+        """Parse numbers from string using provided delimiters."""
         if not numbers_str:
             return []
         
