@@ -1,7 +1,7 @@
 """
 String Calculator implementation following TDD principles.
 
-GREEN PHASE - TDD Cycle 6: Add custom delimiter support.
+REFACTOR PHASE - TDD Cycle 6: Clean, maintainable custom delimiter implementation.
 """
 import re
 
@@ -10,15 +10,19 @@ class StringCalculator:
     """
     A calculator that performs operations on numbers provided as strings.
     
-    Features:
-    - Empty string returns 0 ✅
-    - Single number returns the number itself ✅
-    - Multiple numbers with comma and/or newline delimiters ✅
-    - Custom single character delimiters: //[delimiter]\\n[numbers...] ✅ (GREEN phase)
+    Supported Features:
+    - Empty string returns 0
+    - Single number returns the number itself
+    - Multiple numbers with default delimiters (comma, newline)
+    - Custom single character delimiters: //[delimiter]\\n[numbers...]
+    - Handles whitespace and edge cases gracefully
     """
     
-    # Default delimiters
+    # Default supported delimiters
     DEFAULT_DELIMITERS = [',', '\n']
+    
+    # Custom delimiter pattern
+    CUSTOM_DELIMITER_PATTERN = r"^//(.)\n(.*)$"
     
     def add(self, numbers: str) -> int:
         """
@@ -46,54 +50,52 @@ class StringCalculator:
         if not numbers:
             return 0
         
-        # GREEN PHASE: Parse custom delimiters
-        delimiters, numbers_part = self._parse_delimiters_and_numbers(numbers)
-        number_list = self._parse_numbers(numbers_part, delimiters)
+        delimiters, numbers_part = self._extract_delimiters_and_numbers(numbers)
+        number_list = self._parse_numbers_with_delimiters(numbers_part, delimiters)
         
         return sum(number_list)
     
-    def _parse_delimiters_and_numbers(self, numbers: str) -> tuple[list[str], str]:
+    def _extract_delimiters_and_numbers(self, input_string: str) -> tuple[list[str], str]:
         """
-        Parse custom delimiters and extract the numbers part.
+        Extract delimiters and numbers part from input string.
         
         Args:
-            numbers: Full input string that may contain custom delimiter definition
+            input_string: Full input that may contain custom delimiter definition
             
         Returns:
             Tuple of (delimiters_list, numbers_string)
         """
-        # GREEN PHASE: Check for custom delimiter format //[delimiter]\n
-        if numbers.startswith("//"):
-            # Find the newline that separates delimiter definition from numbers
-            if '\n' in numbers:
-                delimiter_line, numbers_part = numbers.split('\n', 1)
-                # Extract delimiter (everything after //)
-                custom_delimiter = delimiter_line[2:]  # Remove //
-                if custom_delimiter:
-                    return [custom_delimiter], numbers_part
+        # Check for custom delimiter format using regex
+        match = re.match(self.CUSTOM_DELIMITER_PATTERN, input_string, re.DOTALL)
         
-        # No custom delimiter found, use defaults
-        return self.DEFAULT_DELIMITERS.copy(), numbers
+        if match:
+            custom_delimiter = match.group(1)
+            numbers_part = match.group(2)
+            return [custom_delimiter], numbers_part
+        
+        # No custom delimiter, use defaults
+        return self.DEFAULT_DELIMITERS.copy(), input_string
     
-    def _parse_numbers(self, numbers_str: str, delimiters: list[str]) -> list[int]:
+    def _parse_numbers_with_delimiters(self, numbers_str: str, delimiters: list[str]) -> list[int]:
         """
         Parse numbers from string using provided delimiters.
         
         Args:
             numbers_str: String containing numbers
-            delimiters: List of delimiter strings to use for splitting
+            delimiters: List of delimiter strings
             
         Returns:
-            List of integers parsed from string
+            List of parsed integers
         """
         if not numbers_str:
             return []
         
-        # Normalize all delimiters to commas for easier processing
-        normalized = self._normalize_delimiters(numbers_str, delimiters)
+        # Create regex pattern from all delimiters
+        escaped_delimiters = [re.escape(delimiter) for delimiter in delimiters]
+        pattern = '|'.join(escaped_delimiters)
         
-        # Split by comma and convert to integers
-        parts = normalized.split(',')
+        # Split using regex and parse numbers
+        parts = re.split(pattern, numbers_str)
         result = []
         
         for part in parts:
@@ -105,23 +107,3 @@ class StringCalculator:
                     continue
         
         return result
-    
-    def _normalize_delimiters(self, numbers: str, delimiters: list[str]) -> str:
-        """
-        Convert all provided delimiters to commas for uniform processing.
-        
-        Args:
-            numbers: Input string with mixed delimiters
-            delimiters: List of delimiters to normalize
-            
-        Returns:
-            String with all delimiters normalized to commas
-        """
-        normalized = numbers
-        
-        # Replace all delimiters with commas
-        for delimiter in delimiters:
-            if delimiter != ',':  # Don't replace commas with commas
-                normalized = normalized.replace(delimiter, ',')
-        
-        return normalized
