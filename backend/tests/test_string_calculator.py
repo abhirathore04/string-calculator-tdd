@@ -94,3 +94,34 @@ class TestStringCalculator:
         # Edge case: single number with custom delimiter
         result = self.calculator.add("//;\n5")
         assert result == 5, "Single number with custom delimiter '//;\\n5' should return 5"
+	
+	    # ===== STEP 4B: MULTI-CHARACTER CUSTOM DELIMITERS (NEW - RED PHASE) =====
+    def test_custom_multi_character_delimiters(self):
+        """
+        RED PHASE - TDD Cycle 7
+        
+        Test: Custom multi-character delimiters with //[delimiter]\\n[numbers...] format
+        Examples: "//[***]\\n1***2***3" -> 6, "//[sep]\\n1sep2sep3" -> 6
+        
+        Expected: WILL FAIL - multi-character delimiter parsing not implemented yet
+        """
+        # Three asterisks delimiter
+        result = self.calculator.add("//[***]\n1***2***3")
+        assert result == 6, "Multi-char delimiter '//[***]\\n1***2***3' should return 6"
+        
+        # Word delimiter
+        result = self.calculator.add("//[sep]\n1sep2sep3")
+        assert result == 6, "Word delimiter '//[sep]\\n1sep2sep3' should return 6"
+        
+        # Complex delimiter
+        result = self.calculator.add("//[::]\n10::20::30")
+        assert result == 60, "Complex delimiter '//[:::]\\n10::20::30' should return 60"
+        
+        # Single number with multi-char delimiter
+        result = self.calculator.add("//[***]\n42")
+        assert result == 42, "Single number '//[***]\\n42' should return 42"
+        
+        # Longer delimiter
+        result = self.calculator.add("//[DELIM]\n1DELIM2DELIM3DELIM4")
+        assert result == 10, "Long delimiter should work correctly"
+
