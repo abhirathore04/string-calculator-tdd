@@ -1,7 +1,7 @@
 """
 String Calculator implementation following TDD principles.
 
-GREEN PHASE - TDD Cycle 7: Add multi-character custom delimiter support.
+GREEN PHASE - TDD Cycle 8: Add multiple custom delimiter support.
 """
 import re
 
@@ -10,12 +10,13 @@ class StringCalculator:
     """
     A calculator that performs operations on numbers provided as strings.
     
-    Supported Features:
+    Complete Feature Set:
     - Empty string returns 0
     - Single number returns the number itself
     - Multiple numbers with default delimiters (comma, newline)
     - Custom single character delimiters: //[delimiter]\\n[numbers...]
-    - Custom multi-character delimiters: //[delimiter]\\n[numbers...] ✅ (GREEN phase)
+    - Custom multi-character delimiters: //[delimiter]\\n[numbers...]
+    - Multiple custom delimiters: //[delim1][delim2]\\n[numbers...] ✅ (GREEN phase)
     """
     
     # Default supported delimiters
@@ -23,11 +24,12 @@ class StringCalculator:
     
     # Custom delimiter patterns
     SINGLE_CHAR_DELIMITER_PATTERN = r"^//(.)\n(.*)$"
-    MULTI_CHAR_DELIMITER_PATTERN = r"^//\[(.+?)\]\n(.*)$"
+    MULTIPLE_DELIMITERS_PATTERN = r"^//((?:\[.+?\])+)\n(.*)$"
+    BRACKET_DELIMITER_EXTRACT = r"\[(.+?)\]"
     
     def add(self, numbers: str) -> int:
         """
-        Add numbers from a string with various delimiter support.
+        Add numbers from a string with comprehensive delimiter support.
         
         Args:
             numbers: String containing numbers separated by delimiters
@@ -41,7 +43,7 @@ class StringCalculator:
             3
             >>> calc.add("//[***]\\n1***2***3")
             6
-            >>> calc.add("//[sep]\\n1sep2sep3")
+            >>> calc.add("//[*][%]\\n1*2%3")
             6
         """
         if not numbers:
@@ -62,14 +64,18 @@ class StringCalculator:
         Returns:
             Tuple of (delimiters_list, numbers_string)
         """
-        # GREEN PHASE: Check for multi-character delimiter first
-        multi_match = re.match(self.MULTI_CHAR_DELIMITER_PATTERN, input_string, re.DOTALL)
-        if multi_match:
-            custom_delimiter = multi_match.group(1)
-            numbers_part = multi_match.group(2)
-            return [custom_delimiter], numbers_part
+        # GREEN PHASE: Check for multiple bracket-enclosed delimiters first
+        multiple_match = re.match(self.MULTIPLE_DELIMITERS_PATTERN, input_string, re.DOTALL)
+        if multiple_match:
+            delimiter_section = multiple_match.group(1)
+            numbers_part = multiple_match.group(2)
+            
+            # Extract all delimiters from bracket format
+            delimiters = re.findall(self.BRACKET_DELIMITER_EXTRACT, delimiter_section)
+            if delimiters:
+                return delimiters, numbers_part
         
-        # Check for single character delimiter
+        # Check for single character delimiter (no brackets)
         single_match = re.match(self.SINGLE_CHAR_DELIMITER_PATTERN, input_string, re.DOTALL)
         if single_match:
             custom_delimiter = single_match.group(1)
