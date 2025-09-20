@@ -73,3 +73,21 @@ class TestStringCalculator:
         # Single number with newline at end (edge case)
         result = self.calculator.add("5\n")
         assert result == 5, "Number with trailing newline '5\\n' should return 5"
+
+	# ===== STEP 3C: EDGE CASES =====
+    def test_delimiter_edge_cases(self):
+        """Test edge cases for delimiter handling"""
+        # Empty parts should be ignored
+        assert self.calculator.add("1,,2") == 3  # Double comma
+        assert self.calculator.add("1\n\n2") == 3  # Double newline
+        assert self.calculator.add(",1,2,") == 3  # Leading/trailing comma
+        assert self.calculator.add("\n1\n2\n") == 3  # Leading/trailing newline
+        
+        # Whitespace handling
+        assert self.calculator.add(" 1 , 2 ") == 3  # Spaces around numbers
+        assert self.calculator.add("1\n 2 \n 3") == 6  # Mixed whitespace
+        
+        # Complex mixed delimiters
+        assert self.calculator.add("1,\n2,3\n,4") == 10  # Mixed empty parts
+
+
